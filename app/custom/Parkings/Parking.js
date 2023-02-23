@@ -28,6 +28,11 @@ function Parking(props) {
       pin: '',
       state: '',
       address: '',
+      latitude: '',
+      longitude: '',
+      vehicleType: 1,
+      pricePerHour: '',
+      capacity: '',
     })
   const [edit, setEdit] = useState(false);
   const [editData, setEditData] = useState(
@@ -40,6 +45,11 @@ function Parking(props) {
       pin: '',
       state: '',
       address: '',
+      latitude: '',
+      longitude: '',
+      vehicleType: 1,
+      pricePerHour: '',
+      capacity: '',
     })
   const [del, setDelete] = useState(false);
   const [delData, setDelData] = useState({ id: 0 })
@@ -68,6 +78,11 @@ function Parking(props) {
         "state": addData.state,
         "pin": addData.pin,
         "address": addData.address,
+        "latitude": addData.latitude,
+        "longitude": addData.longitude,
+        "vehicleType": addData.vehicleType,
+        "capacity": addData.capacity,
+        "pricePerHour": addData.pricePerHour,
       }),
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -87,6 +102,11 @@ function Parking(props) {
         "state": editData.state,
         "pin": editData.pin,
         "address": editData.address,
+        "latitude": editData.latitude,
+        "longitude": editData.longitude,
+        "vehicleType": editData.vehicleType,
+        "capacity": editData.capacity,
+        "pricePerHour": editData.pricePerHour,
       }),
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -165,6 +185,41 @@ function Parking(props) {
       }
     },
     {
+      label: 'Latitude',
+      name: 'latitude',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      label: 'Longitude',
+      name: 'longitude',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      label: 'Vehicle Type',
+      name: 'vehicleType',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      label: 'Capacity',
+      name: 'capacity',
+      options: {
+        filter: false,
+      }
+    },
+    {
+      label: '₹ Per Hour',
+      name: 'pricePerHour',
+      options: {
+        filter: false,
+      }
+    },
+    {
       name: 'Action',
       options: {
         filter: false,
@@ -211,16 +266,19 @@ function Parking(props) {
   const [data, setData] = useState();
   const [area, setArea] = useState();
   const [placeType, setPlaceType] = useState();
+  const [vehicleType, setVehicleType] = useState();
 
   const getApiData = async () => {
     const response = await fetch(url).then((response) => response.json());
     const areas = await fetch('https://pb.kwad.in/api/areas').then((response) => response.json());
     const placeTypes = await fetch('https://pb.kwad.in/api/placeType').then((response) => response.json());
+    const vehicleTypes = await fetch('https://pb.kwad.in/api/vehicleType').then((response) => response.json());
 
     // update the state
     setData(response);
     setArea(areas);
     setPlaceType(placeTypes);
+    setVehicleType(vehicleTypes);
   };
 
   useEffect(() => {
@@ -332,6 +390,44 @@ function Parking(props) {
                   addData.pin = e.target.value
                 }} />
             </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField id="latitude" label="Latitude" variant="outlined" fullWidth required
+                onChange={(e) => {
+                  addData.latitude = e.target.value
+                }} />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField id="longitude" label="Longitude" variant="outlined" fullWidth required
+                onChange={(e) => {
+                  addData.longitude = e.target.value
+                }} />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel id="vehicleType-label">Vehicle Type</InputLabel>
+              <Select
+                labelId="vehicleType-label"
+                id="vehicleType"
+                label="Vehicle Type"
+                defaultValue=""
+                onChange={(e) => {
+                  addData.vehicleType = e.target.value
+                }}
+              >
+                {vehicleType && vehicleType.map(e => (<MenuItem value={e.id}>{e.type}</MenuItem>))}
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField id="capacity" label="Capacity" variant="outlined" fullWidth required
+                onChange={(e) => {
+                  addData.capacity = e.target.value
+                }} />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField id="pricePerHour" label="PricePerHr" variant="outlined" fullWidth required
+                onChange={(e) => {
+                  addData.pricePerHour = e.target.value
+                }} />
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={submitAdd}>Add</Button>
@@ -403,9 +499,47 @@ function Parking(props) {
                   editData.address = e.target.value
                 }} />
             </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField id="latitude" label="Latitude" variant="outlined" fullWidth required defaultValue={editData.latitude}
+                onChange={(e) => {
+                  editData.latitude = e.target.value
+                }} />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField id="longitude" label="Longitude" variant="outlined" fullWidth required defaultValue={editData.longitude}
+                onChange={(e) => {
+                  editData.longitude = e.target.value
+                }} />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <InputLabel id="vehicleType-label">Vehicle Type</InputLabel>
+              <Select
+                labelId="vehicleType-label"
+                id="vehicleType"
+                label="Vehicle Type"
+                defaultValue={editData.vehicleType}
+                onChange={(e) => {
+                  editData.vehicleType = e.target.value
+                }}
+              >
+                {vehicleType && vehicleType.map(e => (<MenuItem value={e.id}>{e.type}</MenuItem>))}
+              </Select>
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField id="capacity" label="Capacity" variant="outlined" fullWidth required defaultValue={editData.capacity}
+                onChange={(e) => {
+                  editData.capacity = e.target.value
+                }} />
+            </FormControl>
+            <FormControl className={classes.formControl}>
+              <TextField id="pricePerHour" label="PricePerHr" variant="outlined" fullWidth required defaultValue={editData.pricePerHour}
+                onChange={(e) => {
+                  editData.pricePerHour = e.target.value
+                }} />
+            </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={submitEdit}>Edit</Button>
+            <Button onClick={submitEdit}>Update</Button>
           </DialogActions>
         </Dialog>
 
