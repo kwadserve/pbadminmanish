@@ -10,9 +10,6 @@ export const UserList = loadable(() => import('../custom/Users/UserList'), {
 export const ManagerList = loadable(() => import('../custom/Managers/ManagerList'), {
   fallback: <Loading />,
 });
-export const AreaList = loadable(() => import('../custom/Areas/Areas'), {
-  fallback: <Loading />,
-});
 export const OperatorList = loadable(() => import('../custom/Operators/Operators'), {
   fallback: <Loading />,
 });
