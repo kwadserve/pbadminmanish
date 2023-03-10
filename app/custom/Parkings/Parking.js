@@ -17,6 +17,7 @@ const url = 'https://pb.kwad.in/api/parkings'
 function Parking(props) {
   const title = brand.name + ' - Parkings';
   const description = brand.desc;
+  let PMeta = []
   const { classes } = props;
   const [data, setData] = useState();
   const [placeType, setPlaceType] = useState();
@@ -35,7 +36,7 @@ function Parking(props) {
     }
   )
   const [addParkingMeta, setAddPM] = useState([])
-  const [editParkingMeta, setEditPM] = useState([])
+  const [editParkingMeta, setEditPM] = useState()
   const [edit, setEdit] = useState(false);
   const [editData, setEditData] = useState(
     {
@@ -65,6 +66,7 @@ function Parking(props) {
       latitude: '',
       longitude: '',
     })
+    vehicleType.map((e, i) => { setAddPM(oldData => [...oldData, { type: e.id, capacity: 0, rate: 0 }]) })
   };
 
   const getUpdatedApiData = () => {
@@ -95,8 +97,7 @@ function Parking(props) {
       },
     }).then((res) => getUpdatedApiData())
     setAdd(false);
-    setAddPM([])
-    vehicleType.map((e, i) => { setAddPM(oldData => [...oldData, { type: e.id, capacity: 0, rate: 0 }]) })
+    setAddPM([])    
   }
   const submitEdit = () => {
     fetch(url + '/edit', {
@@ -119,6 +120,7 @@ function Parking(props) {
     }).then((res) => getUpdatedApiData())
     setEdit(false);
     setEditPM([])
+    PMeta = []
   }
   const submitDelete = () => {
     fetch(url + '/delete', {
@@ -223,11 +225,7 @@ function Parking(props) {
         filter: false,
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
-          const handleEditClick = () => {
-            setEditPM([])
-            vehicleType.map((e, i) => {
-              setEditPM(oldData => [...oldData, { type: e.id, capacity: 0, rate: 0 }])
-            })
+          const handleEditClick = () => {            
             const p = placeType.filter(entry => { if (entry.type === data[tableMeta.rowIndex].placeType) return entry.id })
             editData.id = data[tableMeta.rowIndex].id
             editData.name = data[tableMeta.rowIndex].name
@@ -238,17 +236,17 @@ function Parking(props) {
             editData.address = data[tableMeta.rowIndex].address
             editData.latitude = data[tableMeta.rowIndex].latitude
             editData.longitude = data[tableMeta.rowIndex].longitude
-
-
+            
             data[tableMeta.rowIndex].meta.map((val, index) => {
-              editParkingMeta.map((v, i) => {
-                if(v.type === val.vehicle_type)
-                {
-                  editParkingMeta[i].capacity = val.capacity
-                  editParkingMeta[i].rate = val.rate
-                }
-              })
+              PMeta.push({type: val.vehicle_type, capacity: val.capacity, rate: val.rate})              
             })
+
+            vehicleType.map((e, i) => {
+              if(PMeta.filter(entry => entry.type === e.id).length === 0)
+              PMeta.push({type: e.id, capacity: 0, rate: 0})
+            })
+            
+            setEditPM(PMeta)
             setEdit(true);
           }
           return (
@@ -286,7 +284,6 @@ function Parking(props) {
     setData(response);
     setPlaceType(placeTypes);
     setVehicleType(vehicleTypes);
-    vehicleTypes.map((e, i) => { setAddPM(oldData => [...oldData, { type: e.id, capacity: 0, rate: 0 }]) })
   };
 
   useEffect(() => {
