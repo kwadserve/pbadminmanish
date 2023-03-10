@@ -25,6 +25,9 @@ export const VehicleTypeList = loadable(() => import('../custom/Type of Vehicle/
 export const Policy = loadable(() => import('../custom/Policy'), {
   fallback: <Loading />,
 });
+export const AssignParking = loadable(() => import('../custom/AssignParking/AssignParking'), {
+  fallback: <Loading />,
+});
 
 // Landing Page
 export const HomePage = loadable(() => import('./LandingPage/HomePage'), {

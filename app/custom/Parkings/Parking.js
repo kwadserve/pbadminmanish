@@ -403,6 +403,7 @@ function Parking(props) {
                 <Grid item xs={12} md={4}>
                   <FormControl className={classes.formControl}>
                     <TextField id="capacity" label="Capacity" variant="outlined" fullWidth required
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                       onChange={(e) => {
                         addParkingMeta[i].capacity = e.target.value
                       }} />
@@ -411,6 +412,7 @@ function Parking(props) {
                 <Grid item xs={12} md={4}>
                   <FormControl className={classes.formControl}>
                     <TextField id="pricePerHour" label="PricePerHr" variant="outlined" fullWidth required
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                       onChange={(e) => {
                         addParkingMeta[i].rate = e.target.value
                       }} />
@@ -498,6 +500,7 @@ function Parking(props) {
                 <Grid item xs={12} md={4}>
                   <FormControl className={classes.formControl}>
                     <TextField id="capacity" label="Capacity" variant="outlined" fullWidth required defaultValue={val.capacity}
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                       onChange={(e) => {
                         editParkingMeta[i].capacity = e.target.value
                       }} />
@@ -506,6 +509,7 @@ function Parking(props) {
                 <Grid item xs={12} md={4}>
                   <FormControl className={classes.formControl}>
                     <TextField id="pricePerHour" label="PricePerHr" variant="outlined" fullWidth required defaultValue={val.rate}
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                       onChange={(e) => {
                         editParkingMeta[i].rate = e.target.value
                       }} />

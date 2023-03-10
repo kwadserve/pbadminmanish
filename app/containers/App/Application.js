@@ -36,7 +36,7 @@ import {
   TrafficIndicator, StreetViewMap,
   NotFound, UserList, ManagerList,
   VehicleTypeList, PlacesList,
-  OperatorList, ParkingList, Policy,
+  OperatorList, ParkingList, Policy, AssignParking
 } from '../pageListAsync';
 
 function Application(props) {
@@ -56,6 +56,7 @@ function Application(props) {
         <Route exact path="/app/operators" component={OperatorList}/>
         <Route exact path="/app/parkings" component={ParkingList}/>
         <Route exact path="/app/types-of-vehicle" component={VehicleTypeList}/>
+        <Route exact path="/app/assign-parking" component={AssignParking}/>
         <Route path="/app/help" component={Chat} />
         <Route path="/app/policies" component={Policy} />
         
