@@ -48,12 +48,23 @@ function Parking(props) {
       address: '',
       latitude: '',
       longitude: '',
+      meta: '',
     })
   const [del, setDelete] = useState(false);
   const [delData, setDelData] = useState({ id: 0 })
 
   const handleAdd = () => {
     setAdd(true);
+    setAddData({
+      name: '',
+      placeType: 0,
+      city: '',
+      pin: '',
+      state: '',
+      address: '',
+      latitude: '',
+      longitude: '',
+    })
   };
 
   const getUpdatedApiData = () => {
@@ -77,7 +88,7 @@ function Parking(props) {
         "address": addData.address,
         "latitude": addData.latitude,
         "longitude": addData.longitude,
-        "meta":addParkingMeta,
+        "meta": addParkingMeta,
       }),
       headers: {
         'Content-type': 'application/json; charset=UTF-8',
@@ -85,7 +96,7 @@ function Parking(props) {
     }).then((res) => getUpdatedApiData())
     setAdd(false);
     setAddPM([])
-    vehicleTypes.map((e, i) => {setAddPM(oldData => [...oldData, {type:e.id, capacity:0, rate:0}])})
+    vehicleType.map((e, i) => { setAddPM(oldData => [...oldData, { type: e.id, capacity: 0, rate: 0 }]) })
   }
   const submitEdit = () => {
     fetch(url + '/edit', {
@@ -107,7 +118,7 @@ function Parking(props) {
       },
     }).then((res) => getUpdatedApiData())
     setEdit(false);
-    vehicleTypes.map((e, i) => {setEditPM(oldData => [...oldData, {type:e.id, capacity:0, rate:0}])})
+    setEditPM([])
   }
   const submitDelete = () => {
     fetch(url + '/delete', {
@@ -194,13 +205,13 @@ function Parking(props) {
         customBodyRender: (value, tableMeta, updateValue) => {
           return (
             <div>
-            {data[tableMeta.rowIndex].meta.map((val, index) => (
-              <div>
-                <span><strong>Type:</strong> {vehicleType && vehicleType.filter(entry => { if (entry.id === val.vehicle_type) return entry.type })[0].type}</span>
-                <span> | <strong>Capacity:</strong> {val.capacity} | </span>
-                <span><strong>Rate:</strong> {val.rate}</span>
-              </div>
-            ))}
+              {data[tableMeta.rowIndex].meta.map((val, index) => (
+                <div>
+                  <span><strong>Type:</strong> {vehicleType && vehicleType.filter(entry => entry.id === val.vehicle_type)[0].type}</span>
+                  <span> | <strong>Capacity:</strong> {val.capacity} | </span>
+                  <span><strong>Rate:</strong> {val.rate}</span>
+                </div>
+              ))}
             </div>
           )
         }
@@ -212,22 +223,39 @@ function Parking(props) {
         filter: false,
         sort: false,
         customBodyRender: (value, tableMeta, updateValue) => {
+          const handleEditClick = () => {
+            setEditPM([])
+            vehicleType.map((e, i) => {
+              setEditPM(oldData => [...oldData, { type: e.id, capacity: 0, rate: 0 }])
+            })
+            const p = placeType.filter(entry => { if (entry.type === data[tableMeta.rowIndex].placeType) return entry.id })
+            editData.id = data[tableMeta.rowIndex].id
+            editData.name = data[tableMeta.rowIndex].name
+            editData.placeType = p[0].id
+            editData.city = data[tableMeta.rowIndex].city
+            editData.state = data[tableMeta.rowIndex].state
+            editData.pin = data[tableMeta.rowIndex].pin
+            editData.address = data[tableMeta.rowIndex].address
+            editData.latitude = data[tableMeta.rowIndex].latitude
+            editData.longitude = data[tableMeta.rowIndex].longitude
+
+
+            data[tableMeta.rowIndex].meta.map((val, index) => {
+              editParkingMeta.map((v, i) => {
+                if(v.type === val.vehicle_type)
+                {
+                  editParkingMeta[i].capacity = val.capacity
+                  editParkingMeta[i].rate = val.rate
+                }
+              })
+            })
+            setEdit(true);
+          }
           return (
             <div>
               <span>
                 <Tooltip title={"Edit"}>
-                  <IconButton onClick={() => {
-                    setEdit(true);
-                    const p = placeType.filter(entry => { if (entry.type === data[tableMeta.rowIndex].placeType) return entry.id })
-                    editData.id = data[tableMeta.rowIndex].id
-                    editData.name = data[tableMeta.rowIndex].name
-                    editData.placeType = p[0].id
-                    editData.city = data[tableMeta.rowIndex].city
-                    editData.state = data[tableMeta.rowIndex].state
-                    editData.pin = data[tableMeta.rowIndex].pin
-                    editData.address = data[tableMeta.rowIndex].address
-                    vehicleTypes.map((e, i) => {setEditPM(oldData => [...oldData, {type:e.id, capacity:0, rate:0}])})
-                  }}>
+                  <IconButton onClick={handleEditClick}>
                     <Edit />
                   </IconButton>
                 </Tooltip>
@@ -258,7 +286,7 @@ function Parking(props) {
     setData(response);
     setPlaceType(placeTypes);
     setVehicleType(vehicleTypes);
-    vehicleTypes.map((e, i) => {setAddPM(oldData => [...oldData, {type:e.id, capacity:0, rate:0}])})
+    vehicleTypes.map((e, i) => { setAddPM(oldData => [...oldData, { type: e.id, capacity: 0, rate: 0 }]) })
   };
 
   useEffect(() => {
@@ -312,7 +340,7 @@ function Parking(props) {
           </DialogTitle>
           <DialogContent>
             <FormControl className={classes.formControl}>
-              <TextField id="name" label="Name" variant="outlined" fullWidth 
+              <TextField id="name" label="Name" variant="outlined" fullWidth
                 onChange={(e) => {
                   addData.name = e.target.value
                 }} />
@@ -332,13 +360,13 @@ function Parking(props) {
               </Select>
             </FormControl>
             <FormControl className={classes.formControl}>
-              <TextField id="city" label="city" variant="outlined" fullWidth 
+              <TextField id="city" label="city" variant="outlined" fullWidth
                 onChange={(e) => {
                   addData.city = e.target.value
                 }} />
             </FormControl>
             <FormControl className={classes.formControl}>
-              <TextField id="state" label="State" variant="outlined" fullWidth 
+              <TextField id="state" label="State" variant="outlined" fullWidth
                 onChange={(e) => {
                   addData.state = e.target.value
                 }} />
@@ -462,27 +490,27 @@ function Parking(props) {
                   editData.longitude = e.target.value
                 }} />
             </FormControl>
-            {vehicleType && vehicleType.map((val, i) => (
+            {editParkingMeta && editParkingMeta.map((val, i) => (
               <Grid container key={i}>
                 <Grid item xs={12} md={4}>
                   <FormControl className={classes.formControl}>
                     <TextField id="vehicleType" label="Vehicle Type" variant="outlined" fullWidth required disabled
-                      value={val.type} />
+                      value={vehicleType && vehicleType.filter(entry => entry.id === val.type)[0].type} />
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <FormControl className={classes.formControl}>
-                    <TextField id="capacity" label="Capacity" variant="outlined" fullWidth required
+                    <TextField id="capacity" label="Capacity" variant="outlined" fullWidth required defaultValue={val.capacity}
                       onChange={(e) => {
-                        addParkingMeta[i].capacity = e.target.value
+                        editParkingMeta[i].capacity = e.target.value
                       }} />
                   </FormControl>
                 </Grid>
                 <Grid item xs={12} md={4}>
                   <FormControl className={classes.formControl}>
-                    <TextField id="pricePerHour" label="PricePerHr" variant="outlined" fullWidth required
+                    <TextField id="pricePerHour" label="PricePerHr" variant="outlined" fullWidth required defaultValue={val.rate}
                       onChange={(e) => {
-                        addParkingMeta[i].rate = e.target.value
+                        editParkingMeta[i].rate = e.target.value
                       }} />
                   </FormControl>
                 </Grid>
