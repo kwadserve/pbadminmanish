@@ -41,12 +41,6 @@ module.exports = [
                 icon: 'business'
             },
             {
-                key: 'area',
-                name: 'Area',
-                link: '/app/area',
-                icon: 'business'
-            },
-            {
                 key: 'parkings',
                 name: 'Parkings',
                 link: '/app/parkings',
