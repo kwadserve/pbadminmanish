@@ -300,7 +300,7 @@ function AssignParking(props) {
                 customBodyRender: (value, tableMeta, updateValue) => {
                     const handleAssign = () => {
                         setAdd(true);
-                        assignParking.parking_id = unAssignedData[tableMeta.rowIndex].parking_id
+                        assignParking.parking_id = unAssignedData[tableMeta.rowIndex].id
                     }
                     return (
                         <div>

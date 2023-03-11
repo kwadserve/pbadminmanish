@@ -28,6 +28,9 @@ export const Policy = loadable(() => import('../custom/Policy'), {
 export const AssignParking = loadable(() => import('../custom/AssignParking/AssignParking'), {
   fallback: <Loading />,
 });
+export const BookedParking = loadable(() => import('../custom/BookedParking/BookedParking'), {
+  fallback: <Loading />,
+});
 
 // Landing Page
 export const HomePage = loadable(() => import('./LandingPage/HomePage'), {
