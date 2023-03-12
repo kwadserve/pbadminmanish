@@ -9,7 +9,7 @@ import { withStyles } from '@material-ui/core/styles';
 import styles from '../styles'
 import {
     Button, IconButton, Tooltip, DialogActions, Dialog, InputLabel, MenuItem, FormControl, Select,
-    DialogContent, DialogTitle, DialogContentText, Grid, Tabs, Tab,
+    DialogContent, DialogTitle, DialogContentText, Grid, Tabs, Tab, FormHelperText
 } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 
@@ -41,33 +41,31 @@ function a11yProps(index) {
         'aria-controls': `scrollable-prevent-tabpanel-${index}`,
     };
 }
-
+const initialAssign = {
+    parking_id: 0,
+    manager_id: 0,
+    operator_id: 0,
+}
+const initialUnAssign = {
+    id: 0,
+    parking_id: 0,
+}
+const initialUpdateAssign = {
+    id: 0,
+    manager_id: 0,
+    operator_id: 0,
+}
+var errVar = false
 function AssignParking(props) {
     const title = 'Assign Parking';
     const description = brand.desc;
     const { classes } = props;
+    const [err, setError] = useState(false)
     const [assignedData, setAssignedData] = useState()
     const [unAssignedData, setUnAssignedData] = useState()
-    const [assignParking, setAssignParking] = useState(
-        {
-            parking_id: 0,
-            manager_id: 0,
-            operator_id: 0,
-        }
-    )
-    const [unAssignParking, setUnAssignParking] = useState(
-        {
-            id: 0,
-            parking_id: 0,
-        }
-    )
-    const [updateAssignParking, setUpdateAssignParking] = useState(
-        {
-            id: 0,
-            manager_id: 0,
-            operator_id: 0,
-        }
-    )
+    const [assignParking, setAssignParking] = useState(initialAssign)
+    const [unAssignParking, setUnAssignParking] = useState(initialUnAssign)
+    const [updateAssignParking, setUpdateAssignParking] = useState(initialUpdateAssign)
     const [add, setAdd] = useState(false);
     const [edit, setEdit] = useState(false);
     const [del, setDelete] = useState(false);
@@ -101,43 +99,60 @@ function AssignParking(props) {
         setEdit(false);
         setDelete(false);
     };
+    const validateAdd = () => {
+      if(assignParking.parking_id == 0 || assignParking.manager_id == 0 || assignParking.operator_id == 0){
+        setError(true)
+        errVar = true
+      } else {
+        setError(false)
+        errVar = false
+      }
+    }
     const submitAdd = () => {
-        fetch('https://pb.kwad.in/api/assignParking', {
-            method: 'post',
-            body: JSON.stringify({
-                "parking_id": assignParking.parking_id,
-                "manager_id": assignParking.manager_id,
-                "operator_id": assignParking.operator_id
-            }),
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8',
-            },
-        }).then((res) => getApiData())
-        setAdd(false);
-        setAssignParking({
-            parking_id: 0,
-            manager_id: 0,
-            operator_id: 0,
-        })
+        validateAdd()
+        if(!errVar){
+            fetch('https://pb.kwad.in/api/assignParking', {
+                method: 'post',
+                body: JSON.stringify({
+                    "parking_id": assignParking.parking_id,
+                    "manager_id": assignParking.manager_id,
+                    "operator_id": assignParking.operator_id
+                }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+            }).then((res) => getApiData())
+            setAdd(false);
+            setAssignParking(initialAssign)
+        }        
+    }
+
+    const validateEdit = () => {
+        if(updateAssignParking.id == 0 || updateAssignParking.manager_id == 0 || updateAssignParking.operator_id == 0){
+            setError(true)
+            errVar = true
+          } else {
+            setError(false)
+            errVar = false
+          }
     }
     const submitEdit = () => {
-        fetch('https://pb.kwad.in/api/assignedParkings/edit', {
-            method: 'post',
-            body: JSON.stringify({
-                "id": updateAssignParking.id,
-                "manager_id": updateAssignParking.manager_id,
-                "operator_id": updateAssignParking.operator_id
-            }),
-            headers: {
-                'Content-type': 'application/json; charset=UTF-8',
-            },
-        }).then((res) => getApiData())
-        setEdit(false);
-        setUpdateAssignParking({
-            id: 0,
-            manager_id: 0,
-            operator_id: 0,
-        })
+        validateEdit()
+        if(!errVar){
+            fetch('https://pb.kwad.in/api/assignedParkings/edit', {
+                method: 'post',
+                body: JSON.stringify({
+                    "id": updateAssignParking.id,
+                    "manager_id": updateAssignParking.manager_id,
+                    "operator_id": updateAssignParking.operator_id
+                }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                },
+            }).then((res) => getApiData())
+            setEdit(false);
+            setUpdateAssignParking(initialUpdateAssign)
+        }        
     }
     const submitDelete = () => {
         fetch('https://pb.kwad.in/api/unAssignParking', {
@@ -151,10 +166,7 @@ function AssignParking(props) {
             },
         }).then((res) => getApiData())
         setDelete(false);
-        setUnAssignParking({
-            id: 0,
-            parking_id: 0,
-        })
+        setUnAssignParking(initialUnAssign)
     }
 
     const optionsAssign = {
@@ -229,9 +241,11 @@ function AssignParking(props) {
                             <span>
                                 <Tooltip title={"Edit"}>
                                     <IconButton onClick={() => {
-                                        updateAssignParking.id = assignedData[tableMeta.rowIndex].id
-                                        updateAssignParking.manager_id = assignedData[tableMeta.rowIndex].manager_id
-                                        updateAssignParking.operator_id = assignedData[tableMeta.rowIndex].operator_id
+                                        setUpdateAssignParking({
+                                            id : assignedData[tableMeta.rowIndex].id,
+                                            manager_id : assignedData[tableMeta.rowIndex].manager_id,
+                                            operator_id : assignedData[tableMeta.rowIndex].operator_id
+                                        })
                                         setEdit(true);
                                     }}>
                                         <Edit />
@@ -242,8 +256,10 @@ function AssignParking(props) {
                                 <Tooltip title={"Unassign"}>
                                     <IconButton onClick={() => {
                                         setDelete(true);
-                                        unAssignParking.id = assignedData[tableMeta.rowIndex].id
-                                        unAssignParking.parking_id = assignedData[tableMeta.rowIndex].parking_id
+                                        setUnAssignParking({
+                                            id : assignedData[tableMeta.rowIndex].id,
+                                            parking_id : assignedData[tableMeta.rowIndex].parking_id,
+                                        })
                                     }}>
                                         <Delete />
                                     </IconButton>
@@ -300,7 +316,9 @@ function AssignParking(props) {
                 customBodyRender: (value, tableMeta, updateValue) => {
                     const handleAssign = () => {
                         setAdd(true);
-                        assignParking.parking_id = unAssignedData[tableMeta.rowIndex].id
+                        setAssignParking({
+                            parking_id : unAssignedData[tableMeta.rowIndex].id
+                        })
                     }
                     return (
                         <div>
@@ -355,13 +373,14 @@ function AssignParking(props) {
             </div>
 
             <Dialog fullWidth={true} maxWidth="md"
-                open={add}
-                onClose={handleClose} >
+                open={add} >
                 <DialogTitle id="alert-dialog-title">
                     {"Assign Parking"}
                 </DialogTitle>
                 <DialogContent>
-                    <FormControl className={classes.formControl}>
+                    <FormControl className={classes.formControl}
+                    {...(assignParking.manager_id == 0 && { error: true })}
+                    >
                         <InputLabel id="managers-label">Manager</InputLabel>
                         <Select
                             labelId="managers-label"
@@ -369,13 +388,21 @@ function AssignParking(props) {
                             label="Managers"
                             defaultValue=""
                             onChange={(e) => {
-                                assignParking.manager_id = e.target.value
+                                setAssignParking({
+                                    ...assignParking,
+                                    manager_id : e.target.value
+                                })
                             }}
                         >
                             {managers && managers.map(e => (<MenuItem value={e.id} key={e.id}>{e.firstName} {e.lastName}</MenuItem>))}
                         </Select>
+                        { assignParking.manager_id == 0 &&
+                            <FormHelperText>Select Manager</FormHelperText>
+                        }
                     </FormControl>
-                    <FormControl className={classes.formControl}>
+                    <FormControl className={classes.formControl}
+                    {...(assignParking.operator_id == 0 && { error: true })}
+                    >
                         <InputLabel id="operators-label">Operator</InputLabel>
                         <Select
                             labelId="operators-label"
@@ -383,26 +410,34 @@ function AssignParking(props) {
                             label="Operators"
                             defaultValue=""
                             onChange={(e) => {
-                                assignParking.operator_id = e.target.value
+                                setAssignParking({
+                                    ...assignParking,
+                                    operator_id : e.target.value
+                                })
                             }}
                         >
                             {operators && operators.map(e => (<MenuItem value={e.id} key={e.id}>{e.firstName} {e.lastName}</MenuItem>))}
                         </Select>
+                        { assignParking.operator_id == 0 &&
+                            <FormHelperText>Select Operator</FormHelperText>
+                        }
                     </FormControl>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={submitAdd}>Assign</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog>
 
             <Dialog fullWidth maxWidth="sm"
-                open={edit}
-                onClose={handleClose} >
+                open={edit} >
                 <DialogTitle id="alert-dialog-title">
                     {"Update Assigned Parking"}
                 </DialogTitle>
                 <DialogContent>
-                    <FormControl className={classes.formControl}>
+                    <FormControl className={classes.formControl}
+                    {...(updateAssignParking.manager_id == 0 && { error: true })}
+                    >
                         <InputLabel id="managers-label">Managers</InputLabel>
                         <Select
                             labelId="managers-label"
@@ -410,13 +445,21 @@ function AssignParking(props) {
                             defaultValue={updateAssignParking.manager_id}
                             label="Managers"
                             onChange={(e) => {
-                                updateAssignParking.manager_id = e.target.value
+                                setUpdateAssignParking({
+                                    ...updateAssignParking,
+                                    manager_id : e.target.value
+                                })
                             }}
                         >
                             {managers && managers.map(e => (<MenuItem value={e.id} key={e.id}>{e.firstName} {e.lastName}</MenuItem>))}
                         </Select>
+                        { updateAssignParking.manager_id == 0 &&
+                            <FormHelperText>Select Manager</FormHelperText>
+                        }
                     </FormControl>
-                    <FormControl className={classes.formControl}>
+                    <FormControl className={classes.formControl}
+                    {...(updateAssignParking.operator_id == 0 && { error: true })}
+                    >
                         <InputLabel id="operators-label">Operators</InputLabel>
                         <Select
                             labelId="operators-label"
@@ -424,15 +467,22 @@ function AssignParking(props) {
                             defaultValue={updateAssignParking.operator_id}
                             label="Operators"
                             onChange={(e) => {
-                                updateAssignParking.operator_id = e.target.value
+                                setUpdateAssignParking({
+                                    ...updateAssignParking,
+                                    operator_id : e.target.value
+                                })
                             }}
                         >
                             {operators && operators.map(e => (<MenuItem value={e.id} key={e.id}>{e.firstName} {e.lastName}</MenuItem>))}
                         </Select>
+                        { updateAssignParking.operator_id == 0 &&
+                            <FormHelperText>Select Operator</FormHelperText>
+                        }
                     </FormControl>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={submitEdit}>Update</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog>
 
@@ -449,6 +499,7 @@ function AssignParking(props) {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={submitDelete}>Unassign</Button>
+                    <Button onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog>
         </div>

@@ -8,82 +8,108 @@ import MUIDataTable from 'mui-datatables';
 import { withStyles } from '@material-ui/core/styles';
 import {
   Button, IconButton, Tooltip, TextField, DialogActions, Dialog, FormControl,
-  DialogContent, DialogTitle, DialogContentText
+  DialogContent, DialogTitle, DialogContentText, Grid
 } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 import styles from '../styles'
 
 const url = 'https://pb.kwad.in/api/operators'
-
+const initialAdd = {
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  mobile: '',
+}
+const initialEdit = {
+  id: 0,
+  firstName: '',
+  lastName: '',
+  email: '',
+  mobile: '',
+}
+var errVar = false
 function Operators(props) {
   const title = brand.name + ' - Operators';
   const description = brand.desc;
   const { classes } = props;
+  const [err, setError] = useState(false)
   const [add, setAdd] = useState(false);
-  const [addData, setAddData] = useState(
-    {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      mobile: '',
-    })
+  const [addData, setAddData] = useState(initialAdd)
   const [edit, setEdit] = useState(false);
-  const [editData, setEditData] = useState(
-    {
-      id: 0,
-      firstName: '',
-      lastName: '',
-      email: '',
-      mobile: '',
-    })
+  const [editData, setEditData] = useState(initialEdit)
   const [del, setDelete] = useState(false);
   const [delData, setDelData] = useState({ id: 0 })
 
   const handleAdd = () => {
-    setAdd(true);
+    setAdd(true)
+    setAddData(initialAdd)
   };
 
   const getUpdatedApiData = () => {
     fetch(url).then((response) => response.json()).then((data) => setData(data));
   };
-  
+
   const handleClose = () => {
     setAdd(false);
     setEdit(false);
     setDelete(false);
   };
+  const validateAdd = () => {
+    if (addData.firstName == '' || addData.lastName == '' || addData.email == '' || addData.password == '' || addData.mobile == '') {
+      setError(true)
+      errVar = true
+    } else {
+      setError(false)
+      errVar = false
+    }
+  }
   const submitAdd = () => {
-    fetch(url, {
-      method: 'post',
-      body: JSON.stringify({
-        "firstName": addData.firstName,
-        "lastName": addData.lastName,
-        "email": addData.email,
-        "password": addData.password,
-        "mobile": addData.mobile,
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    }).then((res) => getUpdatedApiData())
-    setAdd(false);
+    validateAdd()
+    if (!errVar) {
+      fetch(url, {
+        method: 'post',
+        body: JSON.stringify({
+          "firstName": addData.firstName,
+          "lastName": addData.lastName,
+          "email": addData.email,
+          "password": addData.password,
+          "mobile": addData.mobile,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      }).then((res) => getUpdatedApiData())
+      setAdd(false);
+    }
+  }
+  const validateEdit = () => {
+    if (editData.firstName == '' || editData.lastName == '' || editData.email == '' || editData.mobile == '') {
+      setError(true)
+      errVar = true
+    } else {
+      setError(false)
+      errVar = false
+    }
   }
   const submitEdit = () => {
-    fetch(url + '/edit', {
-      method: 'post',
-      body: JSON.stringify({
-        "id": editData.id,
-        "firstName": editData.firstName,
-        "lastName": editData.lastName,
-        "email": editData.email,
-        "mobile": editData.mobile,
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    }).then((res) => getUpdatedApiData())
-    setEdit(false);
+    validateEdit()
+    if (!errVar) {
+      fetch(url + '/edit', {
+        method: 'post',
+        body: JSON.stringify({
+          "id": editData.id,
+          "firstName": editData.firstName,
+          "lastName": editData.lastName,
+          "email": editData.email,
+          "mobile": editData.mobile,
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      }).then((res) => getUpdatedApiData())
+      setEdit(false);
+    }
   }
   const submitDelete = () => {
     fetch(url + '/delete', {
@@ -178,11 +204,13 @@ function Operators(props) {
                 <Tooltip title={"Edit"}>
                   <IconButton onClick={() => {
                     setEdit(true);
-                    editData.id = data[tableMeta.rowIndex].id
-                    editData.firstName = data[tableMeta.rowIndex].firstName
-                    editData.lastName = data[tableMeta.rowIndex].lastName
-                    editData.email = data[tableMeta.rowIndex].email
-                    editData.mobile = data[tableMeta.rowIndex].mobile
+                    setEditData({
+                      id: data[tableMeta.rowIndex].id,
+                      firstName: data[tableMeta.rowIndex].firstName,
+                      lastName: data[tableMeta.rowIndex].lastName,
+                      email: data[tableMeta.rowIndex].email,
+                      mobile: data[tableMeta.rowIndex].mobile
+                    })
                   }}>
                     <Edit />
                   </IconButton>
@@ -192,7 +220,7 @@ function Operators(props) {
                 <Tooltip title={"Delete"}>
                   <IconButton onClick={() => {
                     setDelete(true);
-                    delData.id = data[tableMeta.rowIndex].id
+                    setDelData({ id: data[tableMeta.rowIndex].id })
                   }}>
                     <Delete />
                   </IconButton>
@@ -265,76 +293,98 @@ function Operators(props) {
             {"Add New Operator"}
           </DialogTitle>
           <DialogContent>
-            <FormControl className={classes.formControl}>
-              <TextField id="firstName" label="First Name" variant="outlined" fullWidth required
-                onChange={(e) => {
-                  addData.firstName = e.target.value
-                }} />
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <TextField id="lastName" label="Last Name" variant="outlined" fullWidth required
-                onChange={(e) => {
-                  addData.lastName = e.target.value
-                }} />
-            </FormControl>
+            <Grid container spacing={1}>
+              <Grid item md={6}>
+                <FormControl className={classes.formControl}>
+                  <TextField id="firstName" label="First Name" variant="outlined" fullWidth required
+                    {...(addData.firstName == '' && { error: true, helperText: 'Enter FirstName' })}
+                    onChange={(e) => {
+                      setAddData({ ...addData, firstName: e.target.value })
+                    }} />
+                </FormControl>
+              </Grid>
+              <Grid item md={6}>
+                <FormControl className={classes.formControl}>
+                  <TextField id="lastName" label="Last Name" variant="outlined" fullWidth required
+                    {...(addData.lastName == '' && { error: true, helperText: 'Enter LastName' })}
+                    onChange={(e) => {
+                      setAddData({ ...addData, lastName: e.target.value })
+                    }} />
+                </FormControl>
+              </Grid>
+            </Grid>
             <FormControl className={classes.formControl}>
               <TextField id="email" label="Email" type="email" variant="outlined" fullWidth required
+                {...(addData.email == '' && { error: true, helperText: 'Enter Email' })}
                 onChange={(e) => {
-                  addData.email = e.target.value
+                  setAddData({ ...addData, email: e.target.value })
                 }} />
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField id="password" label="Password" type="password" variant="outlined" fullWidth required
+                {...(addData.password == '' && { error: true, helperText: 'Enter Password' })}
                 onChange={(e) => {
-                  addData.password = e.target.value
+                  setAddData({ ...addData, password: e.target.value })
                 }} />
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField id="mobile" label="Mobile" variant="outlined" fullWidth required
+                {...(addData.mobile == '' && { error: true, helperText: 'Enter Mobile' })}
                 onChange={(e) => {
-                  addData.mobile = e.target.value
+                  setAddData({ ...addData, mobile: e.target.value })
                 }} />
             </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={submitAdd}>Add</Button>
+            <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
 
         <Dialog fullWidth maxWidth="sm"
-          open={edit}
-          onClose={handleClose} >
+          open={edit} >
           <DialogTitle id="alert-dialog-title">
             {"Edit Operator"}
           </DialogTitle>
           <DialogContent>
-            <FormControl className={classes.formControl}>
-              <TextField id="firstName" label="First Name" variant="outlined" fullWidth required defaultValue={editData.firstName}
-                onChange={(e) => {
-                  editData.firstName = e.target.value
-                }} />
-            </FormControl>
-            <FormControl className={classes.formControl}>
-              <TextField id="lastName" label="Last Name" variant="outlined" fullWidth required defaultValue={editData.lastName}
-                onChange={(e) => {
-                  editData.lastName = e.target.value
-                }} />
-            </FormControl>
+            <Grid container spacing={1}>
+              <Grid item md={6}>
+                <FormControl className={classes.formControl}>
+                  <TextField id="firstName" label="First Name" variant="outlined" fullWidth required defaultValue={editData.firstName}
+                    onChange={(e) => {
+                      setEditData({ ...editData, firstName: e.target.value })
+                    }}
+                    {...(editData.firstName == '' && { error: true, helperText: 'Enter FirstName' })} />
+                </FormControl>
+              </Grid>
+              <Grid item md={6}>
+                <FormControl className={classes.formControl}>
+                  <TextField id="lastName" label="Last Name" variant="outlined" fullWidth required defaultValue={editData.lastName}
+                    onChange={(e) => {
+                      setEditData({ ...editData, lastName: e.target.value })
+                    }}
+                    {...(editData.lastName == '' && { error: true, helperText: 'Enter LastName' })} />
+                </FormControl>
+              </Grid>
+            </Grid>
             <FormControl className={classes.formControl}>
               <TextField id="email" label="Email" variant="outlined" fullWidth required defaultValue={editData.email}
                 onChange={(e) => {
-                  editData.email = e.target.value
-                }} />
+                  setEditData({ ...editData, email: e.target.value })
+                }}
+                {...(editData.email == '' && { error: true, helperText: 'Enter Email' })} />
             </FormControl>
             <FormControl className={classes.formControl}>
               <TextField id="mobile" label="Mobile" variant="outlined" fullWidth required defaultValue={editData.mobile}
                 onChange={(e) => {
-                  editData.mobile = e.target.value
-                }} />
+                  setEditData({ ...editData, mobile: e.target.value })
+                }}
+                {...(editData.mobile == '' && { error: true, helperText: 'Enter Mobile' })} />
             </FormControl>
           </DialogContent>
           <DialogActions>
-            <Button onClick={submitEdit}>Edit</Button>
+            <Button onClick={submitEdit}>Update</Button>
+            <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
 
@@ -351,6 +401,7 @@ function Operators(props) {
           </DialogContent>
           <DialogActions>
             <Button onClick={submitDelete}>Delete</Button>
+            <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
       </div>

@@ -11,11 +11,12 @@ import { Add, Delete, Edit } from '@material-ui/icons';
 import styles from '../styles'
 
 const url = 'https://pb.kwad.in/api/placeType'
-
+var errVar = false
 function Places(props) {
   const title = brand.name + ' - Places';
   const description = brand.desc;
   const { classes } = props;
+  const [err, setError] = useState(false)
   const [add, setAdd] = useState(false);
   const [addData, setAddData] = useState({ type: '' })
   const [edit, setEdit] = useState(false);
@@ -25,6 +26,7 @@ function Places(props) {
 
   const handleAdd = () => {
     setAdd(true);
+    setAddData({ type: '' })
   };
 
   const getUpdatedApiData = () => {
@@ -36,31 +38,58 @@ function Places(props) {
     setEdit(false);
     setDelete(false);
   };
+
+  const validateAdd = () => {
+    if(addData.type == ''){
+      setError(true)
+      errVar = true
+    } else {
+      setError(false)
+      errVar = false
+    }
+  }
   const submitAdd = () => {
-    fetch(url, {
-      method: 'post',
-      body: JSON.stringify({
-        "type": addData.type
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    }).then((res) => getUpdatedApiData())
-    setAdd(false);
+    validateAdd()
+    if(!errVar){
+      fetch(url, {
+        method: 'post',
+        body: JSON.stringify({
+          "type": addData.type
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      }).then((res) => getUpdatedApiData())
+      setAdd(false);
+    }
+  }
+
+  const validateEdit = () => {
+    if(editData.type == '' || editData.id == 0){
+      setError(true)
+      errVar = true
+    } else {
+      setError(false)
+      errVar = false
+    }
   }
   const submitEdit = () => {
-    fetch(url + '/edit', {
-      method: 'post',
-      body: JSON.stringify({
-        "id": editData.id,
-        "type": editData.type
-      }),
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    }).then((res) => getUpdatedApiData())
-    setEdit(false);
+    validateEdit()
+    if(!errVar){
+      fetch(url + '/edit', {
+        method: 'post',
+        body: JSON.stringify({
+          "id": editData.id,
+          "type": editData.type
+        }),
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      }).then((res) => getUpdatedApiData())
+      setEdit(false);
+    }    
   }
+
   const submitDelete = () => {
     fetch(url + '/delete', {
       method: 'post',
@@ -102,8 +131,7 @@ function Places(props) {
                 <Tooltip title={"Edit"}>
                   <IconButton onClick={() => {
                     setEdit(true);
-                    editData.id = data[tableMeta.rowIndex].id
-                    editData.type = data[tableMeta.rowIndex].type
+                    setEditData({...editData, id : data[tableMeta.rowIndex].id, type : data[tableMeta.rowIndex].type})
                   }}>
                     <Edit />
                   </IconButton>
@@ -113,7 +141,7 @@ function Places(props) {
                 <Tooltip title={"Delete"}>
                   <IconButton onClick={() => {
                     setDelete(true);
-                    delData.id = data[tableMeta.rowIndex].id
+                    setDelData({id : data[tableMeta.rowIndex].id})
                   }}>
                     <Delete />
                   </IconButton>
@@ -180,36 +208,38 @@ function Places(props) {
         }
 
         <Dialog fullWidth maxWidth="sm" className={classes.dialog}
-          open={add}
-          onClose={handleClose} >
+          open={add} >
           <DialogTitle id="alert-dialog-title">
             {"Add New Place Type"}
           </DialogTitle>
           <DialogContent>
             <TextField id="type" label="Type" variant="outlined" fullWidth required
+            {...(addData.type == '' && { error: true, helperText: 'Enter Place' })}
               onChange={(e) => {
-                addData.type = e.target.value
+                setAddData({type : e.target.value})
               }} />
           </DialogContent>
           <DialogActions>
             <Button onClick={submitAdd}>Add</Button>
+            <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
 
         <Dialog fullWidth maxWidth="sm" className={classes.dialog}
-          open={edit}
-          onClose={handleClose} >
+          open={edit} >
           <DialogTitle id="alert-dialog-title">
             {"Edit Place Type"}
           </DialogTitle>
           <DialogContent>
             <TextField id="type" label="Type" variant="outlined" fullWidth required defaultValue={editData.type}
+            {...(editData.type == '' && { error: true, helperText: 'Enter Place' })}
               onChange={(e) => {
-                editData.type = e.target.value
+                setEditData({type : e.target.value})
               }} />
           </DialogContent>
           <DialogActions>
             <Button onClick={submitEdit}>Edit</Button>
+            <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
 
@@ -226,6 +256,7 @@ function Places(props) {
           </DialogContent>
           <DialogActions>
             <Button onClick={submitDelete}>Delete</Button>
+            <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
       </div>
