@@ -12,6 +12,7 @@ import {
     DialogContent, DialogTitle, DialogContentText, Grid, Tabs, Tab, FormHelperText
 } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
+import Notification from '../Notification/Notification';
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -60,6 +61,8 @@ function AssignParking(props) {
     const title = 'Assign Parking';
     const description = brand.desc;
     const { classes } = props;
+    const [open, setOpen] = useState(false)
+    const [msg, setMsg] = useState('')
     const [err, setError] = useState(false)
     const [assignedData, setAssignedData] = useState()
     const [unAssignedData, setUnAssignedData] = useState()
@@ -123,6 +126,8 @@ function AssignParking(props) {
                 },
             }).then((res) => getApiData())
             setAdd(false);
+            setOpen(true)
+            setMsg('Parking Assigned')
             setAssignParking(initialAssign)
         }        
     }
@@ -151,6 +156,8 @@ function AssignParking(props) {
                 },
             }).then((res) => getApiData())
             setEdit(false);
+            setOpen(true)
+            setMsg('Assigned Parking Updated')
             setUpdateAssignParking(initialUpdateAssign)
         }        
     }
@@ -166,6 +173,8 @@ function AssignParking(props) {
             },
         }).then((res) => getApiData())
         setDelete(false);
+        setOpen(true)
+        setMsg('Parking UnAssigned')
         setUnAssignParking(initialUnAssign)
     }
 
@@ -502,6 +511,8 @@ function AssignParking(props) {
                     <Button onClick={handleClose}>Cancel</Button>
                 </DialogActions>
             </Dialog>
+
+            <Notification open={open} message={msg} close={setOpen}/>
         </div>
     );
 }

@@ -11,6 +11,7 @@ import {
 } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 import styles from '../styles'
+import Notification from '../Notification/Notification';
 
 const url = 'https://pb.kwad.in/api/parkings'
 const initialAdd = {
@@ -42,6 +43,8 @@ function Parking(props) {
   const description = brand.desc;
   let PMeta = []
   const { classes } = props;
+  const [open, setOpen] = useState(false)
+  const [msg, setMsg] = useState('')
   const [err, setError] = useState(false)
   const [data, setData] = useState();
   const [placeType, setPlaceType] = useState();
@@ -102,6 +105,8 @@ function Parking(props) {
       }).then((res) => getUpdatedApiData())
       setAdd(false);
       setAddPM([])
+      setOpen(true)
+      setMsg('Parking Added')
     }        
   }
   const validateEdit = () => {
@@ -135,6 +140,8 @@ function Parking(props) {
         },
       }).then((res) => getUpdatedApiData())
       setEdit(false);
+      setOpen(true)
+      setMsg('Parking Updated')
       setEditPM([])
       PMeta = []
     }    
@@ -150,6 +157,8 @@ function Parking(props) {
       },
     }).then((res) => getUpdatedApiData())
     setDelete(false);
+    setOpen(true)
+    setMsg('Parking Deleted')
   }
 
   const columns = [
@@ -608,6 +617,8 @@ function Parking(props) {
             <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
+
+        <Notification open={open} message={msg} close={setOpen}/>
       </div>
     </div>
   );

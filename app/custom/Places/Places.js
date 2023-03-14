@@ -9,6 +9,7 @@ import { Button, IconButton, Tooltip, TextField, DialogActions, Dialog,
    DialogContent, DialogTitle, DialogContentText } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 import styles from '../styles'
+import Notification from '../Notification/Notification';
 
 const url = 'https://pb.kwad.in/api/placeType'
 var errVar = false
@@ -16,6 +17,8 @@ function Places(props) {
   const title = brand.name + ' - Places';
   const description = brand.desc;
   const { classes } = props;
+  const [open, setOpen] = useState(false)
+  const [msg, setMsg] = useState('')
   const [err, setError] = useState(false)
   const [add, setAdd] = useState(false);
   const [addData, setAddData] = useState({ type: '' })
@@ -61,6 +64,8 @@ function Places(props) {
         },
       }).then((res) => getUpdatedApiData())
       setAdd(false);
+      setOpen(true)
+      setMsg('Place Type Added')
     }
   }
 
@@ -87,6 +92,8 @@ function Places(props) {
         },
       }).then((res) => getUpdatedApiData())
       setEdit(false);
+      setOpen(true)
+      setMsg('Place Type Updated')
     }    
   }
 
@@ -101,6 +108,8 @@ function Places(props) {
       },
     }).then((res) => getUpdatedApiData())
     setDelete(false);
+    setOpen(true)
+    setMsg('Place Type Deleted')
   }
 
 
@@ -234,7 +243,7 @@ function Places(props) {
             <TextField id="type" label="Type" variant="outlined" fullWidth required defaultValue={editData.type}
             {...(editData.type == '' && { error: true, helperText: 'Enter Place' })}
               onChange={(e) => {
-                setEditData({type : e.target.value})
+                setEditData({...editData, type : e.target.value})
               }} />
           </DialogContent>
           <DialogActions>
@@ -259,6 +268,8 @@ function Places(props) {
             <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
+
+        <Notification open={open} message={msg} close={setOpen}/>
       </div>
     </div>
   );

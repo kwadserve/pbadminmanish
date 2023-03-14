@@ -12,6 +12,7 @@ import {
 } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 import styles from '../styles'
+import Notification from '../Notification/Notification';
 
 const url = 'https://pb.kwad.in/api/operators'
 const initialAdd = {
@@ -33,6 +34,8 @@ function Operators(props) {
   const title = brand.name + ' - Operators';
   const description = brand.desc;
   const { classes } = props;
+  const [open, setOpen] = useState(false)
+  const [msg, setMsg] = useState('')
   const [err, setError] = useState(false)
   const [add, setAdd] = useState(false);
   const [addData, setAddData] = useState(initialAdd)
@@ -81,6 +84,8 @@ function Operators(props) {
         },
       }).then((res) => getUpdatedApiData())
       setAdd(false);
+      setOpen(true)
+      setMsg('New Operator Added')
     }
   }
   const validateEdit = () => {
@@ -109,6 +114,8 @@ function Operators(props) {
         },
       }).then((res) => getUpdatedApiData())
       setEdit(false);
+      setOpen(true)
+      setMsg('Operator Updated')
     }
   }
   const submitDelete = () => {
@@ -122,6 +129,8 @@ function Operators(props) {
       },
     }).then((res) => getUpdatedApiData())
     setDelete(false);
+    setOpen(true)
+    setMsg('Operator Deleted')
   }
 
   const columns = [
@@ -404,6 +413,8 @@ function Operators(props) {
             <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
+
+        <Notification open={open} message={msg} close={setOpen}/>
       </div>
     </div>
   );

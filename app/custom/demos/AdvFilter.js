@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import { Add, Delete, Edit, Error, Close } from '@material-ui/icons';
 import styles from '../styles'
-
+import Notification from '../Notification/Notification';
 /*
   It uses npm mui-datatables. It's easy to use, you just describe columns and data collection.
   Checkout full documentation here :
@@ -36,6 +36,8 @@ const initialEdit = {
 var errConst = false
 function AdvFilter(props) {
   const [data, setData] = useState();
+  const [open, setOpen] = useState(false)
+  const [msg, setMsg] = useState('')
   const [err, setError] = useState(false)
   const [add, setAdd] = useState(false);
   const [addData, setAddData] = useState(initialAdd)
@@ -84,6 +86,8 @@ function AdvFilter(props) {
         },
       }).then((res) => getUpdatedApiData())
       setAdd(false);
+      setOpen(true)
+      setMsg('New User Added')
     }
   }
   const validateEdit = () => {
@@ -112,6 +116,8 @@ function AdvFilter(props) {
         },
       }).then((res) => getUpdatedApiData())
       setEdit(false);
+      setOpen(true)
+      setMsg('User Updated')
     }
   }
   const submitDelete = () => {
@@ -125,6 +131,8 @@ function AdvFilter(props) {
       },
     }).then((res) => getUpdatedApiData())
     setDelete(false);
+    setOpen(true)
+    setMsg('User Deleted')
   }
 
   const getApiData = async () => {
@@ -398,6 +406,8 @@ function AdvFilter(props) {
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
       </Dialog>
+
+      <Notification open={open} message={msg} close={setOpen}/>
     </div>
   );
 }

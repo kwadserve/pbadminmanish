@@ -12,6 +12,7 @@ import {
 } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 import styles from '../styles'
+import Notification from '../Notification/Notification';
 
 const url = 'https://pb.kwad.in/api/managers'
 const initialAdd = {
@@ -33,6 +34,8 @@ function ManagerList(props) {
   const title = brand.name + ' - Managers';
   const description = brand.desc;
   const { classes } = props;
+  const [open, setOpen] = useState(false)
+  const [msg, setMsg] = useState('')
   const [err, setError] = useState(false)
   const [add, setAdd] = useState(false);
   const [addData, setAddData] = useState(initialAdd)
@@ -80,6 +83,8 @@ function ManagerList(props) {
         },
       }).then((res) => getUpdatedApiData())
       setAdd(false);
+      setOpen(true)
+      setMsg('New Manager Added')
     }
   }
   const validateEdit = () => {
@@ -108,6 +113,8 @@ function ManagerList(props) {
         },
       }).then((res) => getUpdatedApiData())
       setEdit(false);
+      setOpen(true)
+      setMsg('Manager Updated')
     }
   }
   const submitDelete = () => {
@@ -121,6 +128,8 @@ function ManagerList(props) {
       },
     }).then((res) => getUpdatedApiData())
     setDelete(false);
+    setOpen(true)
+    setMsg('Manager Deleted')
   }
 
   const columns = [
@@ -406,6 +415,8 @@ function ManagerList(props) {
             <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
+
+        <Notification open={open} message={msg} close={setOpen}/>
       </div>
     </div>
   );

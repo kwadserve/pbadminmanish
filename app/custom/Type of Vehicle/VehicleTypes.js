@@ -8,6 +8,7 @@ import { Button, IconButton, Tooltip, TextField, DialogActions, Dialog,
    DialogContent, DialogTitle, DialogContentText } from '@material-ui/core';
 import { Add, Delete, Edit } from '@material-ui/icons';
 import styles from '../styles'
+import Notification from '../Notification/Notification';
 
 const url = 'https://pb.kwad.in/api/vehicleType'
 var errVar = false
@@ -15,6 +16,8 @@ function VehicleTypes(props) {
   const title = brand.name + ' - Vehicle Types';
   const description = brand.desc;
   const { classes } = props;
+  const [open, setOpen] = useState(false)
+  const [msg, setMsg] = useState('')
   const [err, setError] = useState(false)
   const [data, setData] = useState();
   const [add, setAdd] = useState(false);
@@ -61,6 +64,8 @@ function VehicleTypes(props) {
         },
       }).then((res) => getUpdatedApiData())
       setAdd(false);
+      setOpen(true)
+      setMsg('Vehicle Type Added')
     }    
   }
   const validateEdit = () => {
@@ -87,6 +92,8 @@ function VehicleTypes(props) {
         },
       }).then((res) => getUpdatedApiData())
       setEdit(false);
+      setOpen(true)
+      setMsg('Vehicle Type Updated')
     }
   }
   const submitDelete = () => {
@@ -100,6 +107,9 @@ function VehicleTypes(props) {
       },
     }).then((res) => getUpdatedApiData())
     setDelete(false);
+    
+    setOpen(true)
+    setMsg('Vehicle Type Deleted')
   }
 
   const getApiData = async () => {
@@ -229,7 +239,7 @@ function VehicleTypes(props) {
             <TextField id="type" label="Type" variant="outlined" fullWidth required defaultValue={editData.type}
             {...(editData.type == '' && { error: true, helperText: 'Enter Vehicle Type' })}
               onChange={(e) => {
-                setEditData({type : e.target.value})
+                setEditData({...editData, type : e.target.value})
               }} />
           </DialogContent>
           <DialogActions>
@@ -254,6 +264,8 @@ function VehicleTypes(props) {
             <Button onClick={handleClose}>Cancel</Button>
           </DialogActions>
         </Dialog>
+
+        <Notification open={open} message={msg} close={setOpen}/>
       </div>
     </div>
   );
